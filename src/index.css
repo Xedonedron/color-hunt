@@ -1,0 +1,58 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Space+Grotesk:wght@300;400;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+}
+
+body {
+  background-color: #f3f4f6;
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(0, 0, 0, 0.03) 0px,
+    rgba(0, 0, 0, 0.03) 1px,
+    transparent 1px,
+    transparent 10px
+  );
+  overflow-x: hidden;
+}
+
+.google-stitch-bg {
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(0, 0, 0, 0.03) 0px,
+    rgba(0, 0, 0, 0.03) 2px,
+    transparent 2px,
+    transparent 20px
+  );
+  position: relative;
+  overflow: hidden;
+}
+
+/* Fix for truncated italic display fonts by adding extra horizontal breathing room */
+.font-display {
+  display: inline-block;
+  padding-left: 0.15em;
+  padding-right: 0.15em;
+  font-style: italic;
+  overflow: visible;
+}
+
+.paint-splash {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.12;
+  filter: blur(60px);
+  border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; /* More irregular organic splash shape */
+}
+
+.polaroid-frame {
+  background: white;
+  padding: 10px;
+  padding-bottom: 30px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+  border: 1px solid #ddd;
+  transform: rotate(-2deg);
+}

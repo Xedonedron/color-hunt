@@ -1,0 +1,8 @@
+{
+  "name": "Color Hunt",
+  "description": "A real-world scavenger hunt game where players find and capture specific colors using their camera.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": []
+}
