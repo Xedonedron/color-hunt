@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 import HostView from './components/HostView';
 import PlayerView from './components/PlayerView';
@@ -16,6 +16,11 @@ export default function App() {
   const [playerName, setPlayerName] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [initialRoomCode, setInitialRoomCode] = useState('');
+
+  const roomIdRef = useRef<string | null>(null);
+  useEffect(() => {
+    roomIdRef.current = roomId;
+  }, [roomId]);
 
   const [playerId] = useState(() => {
     let pid = localStorage.getItem('playerId');
@@ -67,6 +72,7 @@ export default function App() {
     }
 
     socket.on('room_update', (data) => {
+      if (roomIdRef.current && roomIdRef.current !== data.id) return;
       setRoomData(data);
     });
 
@@ -77,6 +83,9 @@ export default function App() {
 
   // Handle local state cleanup on kick/close
   const clearSession = () => {
+      if (roomIdRef.current) {
+        socket.emit('leave_room', { roomId: roomIdRef.current, playerId });
+      }
       localStorage.removeItem('savedRoom');
       localStorage.removeItem('savedRole');
       setRole('LOBBY');

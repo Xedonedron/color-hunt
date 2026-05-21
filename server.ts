@@ -436,6 +436,32 @@ async function startServer() {
       }
     });
 
+    socket.on('leave_room', ({ roomId, playerId }) => {
+      const room = rooms[roomId];
+      if (room) {
+        socket.leave(roomId);
+        if (room.players[playerId]) {
+          delete room.players[playerId];
+        }
+        
+        let shouldUpdate = true;
+
+        if (room.hostId === playerId) {
+          const remainingPlayers = Object.keys(room.players);
+          if (remainingPlayers.length > 0) {
+            room.hostId = remainingPlayers[0];
+          } else {
+            delete rooms[roomId];
+            shouldUpdate = false;
+          }
+        }
+
+        if (shouldUpdate) {
+            emitRoomUpdate(io, roomId, room);
+        }
+      }
+    });
+
     socket.on('disconnect', () => {
       for (const roomId in rooms) {
         const room = rooms[roomId];
