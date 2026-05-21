@@ -23,14 +23,22 @@ function TargetStageReveal({ roomData, onComplete }: { roomData: Room; onComplet
   const [timeLeft, setTimeLeft] = useState(10);
 
   useEffect(() => {
-    const timeInterval = setInterval(() => {
-      if (roomData.endTime) {
-        const remaining = Math.max(0, Math.ceil((roomData.endTime - Date.now()) / 1000));
+    let timeInterval: NodeJS.Timeout;
+    if (roomData.endTime) {
+      const timeOffset = roomData.serverTime ? Date.now() - roomData.serverTime : 0;
+      
+      const updateTimer = () => {
+        const now = Date.now() - timeOffset;
+        let remaining = Math.ceil((roomData.endTime! - now) / 1000);
+        if (remaining < 0) remaining = 0;
         setTimeLeft(remaining);
-      }
-    }, 100);
+      };
+
+      updateTimer();
+      timeInterval = setInterval(updateTimer, 1000);
+    }
     return () => clearInterval(timeInterval);
-  }, [roomData.endTime]);
+  }, [roomData.endTime, roomData.serverTime]);
 
   let interval: NodeJS.Timeout;
 
@@ -57,7 +65,7 @@ function TargetStageReveal({ roomData, onComplete }: { roomData: Room; onComplet
       clearInterval(interval);
       clearTimeout(timeout);
     };
-  }, [isSpinning, roomData.targetColor]);
+  }, [isSpinning, roomData.targetColor?.hex]);
 
   return (
     <div className="min-h-screen bg-transparent text-indigo-900 flex flex-col items-center justify-center p-8 font-sans overflow-hidden">
@@ -121,16 +129,14 @@ function TargetStageReveal({ roomData, onComplete }: { roomData: Room; onComplet
            )}
         </div>
 
-        {!isSpinning && (
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             className="mt-8 bg-white/50 backdrop-blur-sm p-4 px-8 rounded-full shadow-sm border border-indigo-50"
           >
-             <span className="text-xs font-black uppercase tracking-[0.4em] text-indigo-400 mr-4">Waktu Menghafal</span>
+             <span className="text-xs font-black uppercase tracking-[0.4em] text-indigo-400 mr-4">{isSpinning ? 'Mengacak...' : 'Waktu Menghafal'}</span>
              <span className="text-2xl font-black font-mono text-indigo-950">{timeLeft}s</span>
           </motion.div>
-        )}
       </motion.div>
     </div>
   );
