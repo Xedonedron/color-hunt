@@ -27,7 +27,15 @@ export default function App() {
   });
 
   useEffect(() => {
-    socket.emit('identify', { playerId });
+    const handleConnect = () => {
+      socket.emit('identify', { playerId });
+    };
+    socket.on('connect', handleConnect);
+    if (socket.connected) {
+      handleConnect();
+    } else {
+      socket.emit('identify', { playerId });
+    }
 
     const params = new URLSearchParams(window.location.search);
     const roomParam = params.get('room');
@@ -61,6 +69,10 @@ export default function App() {
     socket.on('room_update', (data) => {
       setRoomData(data);
     });
+
+    return () => {
+      socket.off('connect', handleConnect);
+    };
   }, [playerId]);
 
   // Handle local state cleanup on kick/close
